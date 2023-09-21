@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/denisenkom/go-mssqldb"
+	"github.com/gin-gonic/gin"
 	"log"
+	"net/http"
 	"net/url"
 )
 
@@ -18,15 +20,13 @@ type Hotspot struct {
 	Longitude string `json:"Longitude"`
 }
 
-func main() {
+func hotspotsJson() []Hotspot {
 	var hotspots []Hotspot
-	var hotspotsMap = make(map[string]string)
 	u := &url.URL{
 		Scheme: "sqlserver",
 		User:   url.UserPassword("sa", "Skies-Backer-Overlord1-Voucher"),
 		Host:   fmt.Sprintf("%s:%d", "49.13.85.200", 1433),
 	}
-
 	db, err := sql.Open("sqlserver", u.String())
 	if err != nil {
 		log.Fatal(err)
@@ -37,7 +37,6 @@ func main() {
 		panic(err)
 	}
 	defer rows.Close()
-
 	for rows.Next() {
 		var hotspot Hotspot
 
@@ -51,25 +50,46 @@ func main() {
 			panic(err)
 		}
 		hotspots = append(hotspots, hotspot)
-		hotspotsMap[hotspot.Title] = hotspot.Latitude + "," + hotspot.Longitude
 	}
-	var hotspotsJson, _ = json.MarshalIndent(hotspots, "", "  ") // Indent with two spaces
-	fmt.Println(string(hotspotsJson))
+	//var hotspotsJson, _ = json.MarshalIndent(hotspots, "", "  ") // Indent with two spaces
+	return hotspots
+}
+
+func main() {
 	fmt.Println("-----------------------------------------------------------")
+
+	//extracting from DB the values
+	hotspots := hotspotsJson()
+
+	//Here is created a map with keys(title of hotspot) and values(coordinates of hotspot)
+	//Don't know if we will use it but let it be for the moment
+	var hotspotsMap = make(map[string]string)
+	j := len(hotspots)
+	for i := 0; i < j; i++ {
+		hotspotsMap[hotspots[i].Title] = hotspots[i].Latitude + "," + hotspots[i].Longitude
+	}
 	for key := range hotspotsMap {
 		fmt.Printf(" %s,  %s\n",
 			key, hotspotsMap[key])
 	}
 
-	//r := gin.Default()
-	//r.GET("/ping", func(c *gin.Context) {
-	//	c.JSON(200, gin.H{
-	//		"message": "pong",
-	//	})
-	//})
-	//// listen and serve on 0.0.0.0:8080
-	//err = r.Run(":8080")
-	//if err != nil {
-	//	panic(err)
-	//}
+	//http://localhost:8080/hotspots
+	//Check if this is OK
+	r := gin.Default()
+	r.GET("/hotspots", func(c *gin.Context) {
+		// Marshal the hotspots data with indentation
+		hotspotsJSON, err := json.MarshalIndent(hotspots, "", "  ")
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		c.Header("Content-Type", "application/json")
+		c.String(http.StatusOK, string(hotspotsJSON))
+	})
+	//listen and serve on 0.0.0.0:8080
+	var err = r.Run(":8080")
+	if err != nil {
+		panic(err)
+	}
+
 }
