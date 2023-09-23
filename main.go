@@ -13,15 +13,16 @@ import (
 var db *sql.DB
 
 type Hotspot struct {
-	HotspotID int     `json:"hotspot-id"`
-	Title     string  `json:"title"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
+	HotspotID   int     `json:"hotspot-id"`
+	Title       string  `json:"title"`
+	Latitude    float64 `json:"latitude"`
+	Longitude   float64 `json:"longitude"`
+	Description string  `json:"description"`
 }
 
 func hotspotsJson() ([]Hotspot, error) {
 	var hotspots []Hotspot
-	rows, err := db.Query("USE PhotoApp SELECT HotspotsID, Title, Latitude, Longitude FROM Hotspots")
+	rows, err := db.Query("USE PhotoApp SELECT HotspotsID, Title, Latitude, Longitude,Description FROM Hotspots")
 	if err != nil {
 		return nil, err
 	}
@@ -39,6 +40,7 @@ func hotspotsJson() ([]Hotspot, error) {
 			&hotspot.Title,
 			&hotspot.Latitude,
 			&hotspot.Longitude,
+			&hotspot.Description,
 		)
 		if err != nil {
 			return nil, err
