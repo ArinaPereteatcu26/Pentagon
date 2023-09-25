@@ -1,7 +1,7 @@
 package db
 
 type Hotspot struct {
-	HotspotID   int     `json:"hotspot-id"`
+	HotspotID   int     `json:"hotspot_id"`
 	Title       string  `json:"title"`
 	Latitude    float64 `json:"latitude"`
 	Longitude   float64 `json:"longitude"`

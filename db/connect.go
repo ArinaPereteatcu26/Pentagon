@@ -10,7 +10,7 @@ import (
 var connectionURL = url.URL{
 	Scheme: "sqlserver",
 	User:   url.UserPassword(os.Getenv("DB_LOGIN"), os.Getenv("DB_PASS")),
-	Host:   fmt.Sprintf("%s:%d", os.Getenv("DB_SERVER"), 1433),
+	Host:   fmt.Sprintf("%s:%d", os.Getenv("DB_HOST"), 1433),
 }
 
 var db *sql.DB
