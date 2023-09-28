@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/ArinaPereteatcu26/Pentagon/db"
 	"github.com/gin-gonic/gin"
 	"log"
+	"net/http"
 )
 
 func GetHotspots(c *gin.Context) {
@@ -14,4 +16,31 @@ func GetHotspots(c *gin.Context) {
 		return
 	}
 	c.JSON(200, hotspots)
+}
+
+func PostHotspot(c *gin.Context) {
+	var hotspot db.Hotspot
+	err := c.BindJSON(&hotspot)
+	if err != nil {
+		log.Println("Error", err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
+		return
+	}
+	if len(hotspot.Title) == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "Empty title")
+		return
+	}
+
+	if len(hotspot.Title) > 50 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "Title too long")
+		return
+	}
+
+	if len(hotspot.Description) > 1000 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "Description too long")
+		return
+	}
+
+	c.Status(200)
+	fmt.Printf("%+v", hotspot)
 }

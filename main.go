@@ -17,6 +17,8 @@ func main() {
 	r := gin.Default()
 	r.GET("/hotspots", handlers.GetHotspots)
 
+	r.POST("/hotspots", handlers.PostHotspot)
+
 	// listen and serve on localhost:8080
 	err = r.Run(":8080")
 	if err != nil {
