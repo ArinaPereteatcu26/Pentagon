@@ -8,7 +8,8 @@ type Hotspot struct {
 	Description string  `json:"description"`
 }
 
-const getHotspotQuery = "SELECT HotspotsID, Title, Latitude, Longitude, Description FROM PhotoApp.dbo.Hotspots"
+const getHotspotQuery = "SELECT ID, Title, Latitude, Longitude, Description FROM PhotoApp.dbo.Hotspots"
+const addHotspotQuery = "INSERT INTO PhotoApp.dbo.Hotspots(Title, Latitude, Longitude, Description) VALUES (@p1, @p2, @p3, @p4)"
 
 func GetHotspots() ([]Hotspot, error) {
 	var hotspots []Hotspot
@@ -35,4 +36,8 @@ func GetHotspots() ([]Hotspot, error) {
 		hotspots = append(hotspots, hotspot)
 	}
 	return hotspots, nil
+}
+func AddHotspot(hotspot Hotspot) error {
+	_, err := db.Exec(addHotspotQuery, hotspot.Title, hotspot.Latitude, hotspot.Longitude, hotspot.Description)
+	return err
 }
