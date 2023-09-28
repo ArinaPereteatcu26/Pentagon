@@ -9,7 +9,7 @@ type Hotspot struct {
 }
 
 const getHotspotQuery = "SELECT ID, Title, Latitude, Longitude, Description FROM PhotoApp.dbo.Hotspots"
-const addHotspotQuery = "INSERT INTO PhotoApp.dbo.Hotspots(Title, Latitude, Longitude, Description) VALUES (?,?,?,?)"
+const addHotspotQuery = "INSERT INTO PhotoApp.dbo.Hotspots(Title, Latitude, Longitude, Description) VALUES (@p1, @p2, @p3, @p4)"
 
 func GetHotspots() ([]Hotspot, error) {
 	var hotspots []Hotspot
