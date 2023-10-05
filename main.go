@@ -19,6 +19,10 @@ func main() {
 
 	r.POST("/hotspots", handlers.PostHotspot)
 
+	r.POST("/hotspots/:id", handlers.Photos)
+
+	r.Static("/static", "./static")
+
 	// listen and serve on localhost:8080
 	err = r.Run(":8080")
 	if err != nil {
