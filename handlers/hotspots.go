@@ -6,10 +6,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func GetHotspots(c *gin.Context) {
 	hotspots, err := db.GetHotspots()
+	for i := range hotspots {
+		photos, err := db.GetPhotos(strconv.Itoa(hotspots[i].HotspotID))
+		if err != nil {
+			continue
+		}
+		hotspots[i].Photos = photos
+	}
 	if err != nil {
 		log.Println("Error: ", err.Error())
 		c.AbortWithStatusJSON(500, "Failed to get data from database")
