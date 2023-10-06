@@ -1,0 +1,11 @@
+version: "3.4"
+
+services:
+  app:
+    image: pentagon
+    container_name: pentagon
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
