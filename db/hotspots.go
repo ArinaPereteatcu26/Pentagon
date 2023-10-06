@@ -1,11 +1,12 @@
 package db
 
 type Hotspot struct {
-	HotspotID   int     `json:"hotspot_id"`
-	Title       string  `json:"title"`
-	Latitude    float64 `json:"latitude"`
-	Longitude   float64 `json:"longitude"`
-	Description string  `json:"description"`
+	HotspotID   int      `json:"hotspot_id"`
+	Title       string   `json:"title"`
+	Latitude    float64  `json:"latitude"`
+	Longitude   float64  `json:"longitude"`
+	Description string   `json:"description"`
+	Photos      []string `json:"photos"`
 }
 
 const getHotspotQuery = "SELECT ID, Title, Latitude, Longitude, Description FROM PhotoApp.dbo.Hotspots"
