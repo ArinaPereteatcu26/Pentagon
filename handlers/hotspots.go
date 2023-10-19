@@ -49,13 +49,13 @@ func PostHotspot(c *gin.Context) {
 		return
 	}
 
-	err = db.AddHotspot(hotspot)
+	id, err := db.AddHotspot(hotspot)
 	if err != nil {
 		log.Println("Error", err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, "Error adding hotspot")
 		return
 	}
 
-	c.Status(200)
+	c.JSON(200, id)
 	fmt.Printf("%+v", hotspot)
 }

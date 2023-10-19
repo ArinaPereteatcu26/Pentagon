@@ -10,7 +10,7 @@ type Hotspot struct {
 }
 
 const getHotspotQuery = "SELECT ID, Title, Latitude, Longitude, Description FROM PhotoApp.dbo.Hotspots"
-const addHotspotQuery = "INSERT INTO PhotoApp.dbo.Hotspots(Title, Latitude, Longitude, Description) VALUES (@p1, @p2, @p3, @p4)"
+const addHotspotQuery = "INSERT INTO PhotoApp.dbo.Hotspots(Title, Latitude, Longitude, Description) OUTPUT Inserted.ID VALUES (@p1, @p2, @p3, @p4)"
 
 func GetHotspots() ([]Hotspot, error) {
 	var hotspots []Hotspot
@@ -38,7 +38,11 @@ func GetHotspots() ([]Hotspot, error) {
 	}
 	return hotspots, nil
 }
-func AddHotspot(hotspot Hotspot) error {
-	_, err := db.Exec(addHotspotQuery, hotspot.Title, hotspot.Latitude, hotspot.Longitude, hotspot.Description)
-	return err
+func AddHotspot(hotspot Hotspot) (int, error) {
+	var id int
+	err := db.QueryRow(addHotspotQuery, hotspot.Title, hotspot.Latitude, hotspot.Longitude, hotspot.Description).Scan(&id)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }
