@@ -1,41 +1,45 @@
 package db
 
+import "errors"
+
 type User struct {
-	PersonId int    `json:"person_id"`
+	PersonId int    `json:"-"`
 	Login    string `json:"login"`
 	Password string `json:"password"`
+	Hash     string `json:"-"`
 }
 
-const getUserQuery = "SELECT PersonId, Login, Password FROM PhotoApp.dbo.Users"
-const addUserQuery = "INSERT INTO PhotoApp.dbo.Users(Login, Password) OUTPUT Inserted.PersonId VALUES (@p1, @p2)"
+const getUserQuery = "SELECT PersonId, Login, Hash FROM PhotoApp.dbo.Users WHERE Login = @p1"
+const addUserQuery = "INSERT INTO PhotoApp.dbo.Users(Login, Hash) OUTPUT Inserted.PersonId VALUES (@p1, @p2)"
 
-func GetUsers() ([]User, error) {
-	var users []User
-
-	rows, err := db.Query(getUserQuery)
+func GetUser(login string) (*User, error) {
+	rows, err := db.Query(getUserQuery, login)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	for rows.Next() {
-		var user User
-
-		err := rows.Scan(
-			&user.PersonId,
-			&user.Login,
-			&user.Password,
-		)
-		if err != nil {
-			return nil, err
-		}
-		users = append(users, user)
+	if !rows.Next() {
+		return nil, errors.New("no such user")
 	}
-	return users, nil
+
+	var user User
+	err = rows.Scan(
+		&user.PersonId,
+		&user.Login,
+		&user.Hash,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
+
 func AddUser(user User) (int, error) {
 	var id int
-	err := db.QueryRow(addUserQuery, user.Login, user.Password).Scan(&id)
+
+	err := db.QueryRow(addUserQuery, user.Login, user.Hash).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
