@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/ArinaPereteatcu26/Pentagon/db"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+
+	"github.com/ArinaPereteatcu26/Pentagon/db"
+	"github.com/gin-gonic/gin"
 )
 
 func Photos(c *gin.Context) {
@@ -18,14 +19,14 @@ func Photos(c *gin.Context) {
 	// Upload the file to specific dst.
 	err := c.SaveUploadedFile(file, dst)
 	if err != nil {
-		c.AbortWithStatusJSON(500, "failed to store photo")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, "failed to store photo")
 		log.Println(err)
 		return
 	}
 
 	err = db.AddPhoto(id, file.Filename)
 	if err != nil {
-		c.AbortWithStatusJSON(500, "failed to store photo in DB")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, "failed to store photo in DB")
 		log.Println(err)
 		return
 	}

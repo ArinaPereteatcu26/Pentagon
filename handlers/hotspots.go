@@ -2,11 +2,13 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/ArinaPereteatcu26/Pentagon/db"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/ArinaPereteatcu26/Pentagon/db"
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 )
 
 func GetHotspots(c *gin.Context) {
@@ -31,9 +33,21 @@ func PostHotspot(c *gin.Context) {
 	err := c.BindJSON(&hotspot)
 	if err != nil {
 		log.Println("Error", err.Error())
-		c.AbortWithStatusJSON(500, err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	claims := c.Value("claims").(*jwt.StandardClaims)
+	if claims == nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "No claims")
+		return
+	}
+	fmt.Println("claim", claims.Subject)
+	hotspot.PersonID, err = strconv.Atoi(claims.Subject)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+	}
+
 	if len(hotspot.Title) == 0 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "Empty title")
 		return
@@ -56,6 +70,6 @@ func PostHotspot(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, id)
+	c.JSON(http.StatusOK, id)
 	fmt.Printf("%+v", hotspot)
 }
